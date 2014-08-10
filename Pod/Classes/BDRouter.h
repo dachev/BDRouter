@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "NSURL+BDRouter.h"
 
 @interface BDRouter : NSObject
 + (BDRouter*)shared;
