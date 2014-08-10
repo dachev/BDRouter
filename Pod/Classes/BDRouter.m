@@ -64,7 +64,10 @@
             continue;
         }
         
-        BD_SUPPRESS_PERFORM_SELECTOR_LEAK_WARNING([observer performSelector:selector withObject:url]);
+        dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 0.01);
+        dispatch_after(delay, dispatch_get_main_queue(), ^(void){
+            BD_SUPPRESS_PERFORM_SELECTOR_LEAK_WARNING([observer performSelector:selector withObject:url]);
+        });
     }
 }
 
@@ -89,7 +92,10 @@
             continue;
         }
         
-        BD_SUPPRESS_PERFORM_SELECTOR_LEAK_WARNING([observer performSelector:selector withObject:url]);
+        dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 0.01);
+        dispatch_after(delay, dispatch_get_main_queue(), ^(void){
+            BD_SUPPRESS_PERFORM_SELECTOR_LEAK_WARNING([observer performSelector:selector withObject:url]);
+        });
     }
 }
 
