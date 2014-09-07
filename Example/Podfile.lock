@@ -1,5 +1,5 @@
 PODS:
-  - BDRouter (0.1.0):
+  - BDRouter (0.2.0):
     - Underscore.m (~> 0.2)
   - Expecta (0.3.1)
   - Specta (0.2.1)
@@ -15,7 +15,7 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  BDRouter: 195c9b659287115662ed3c202dac1e34bb28ad89
+  BDRouter: 283f06313c4dbba3a197f40c303c529f4b761cf9
   Expecta: 03aabd0a89d8dea843baecb19a7fd7466a69a31d
   Specta: 9141310f46b1f68b676650ff2854e1ed0b74163a
   Underscore.m: f99c166a9fdccfb5069085b6b4263c04b817fc9f
