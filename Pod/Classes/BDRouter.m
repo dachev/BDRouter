@@ -58,8 +58,13 @@
     
     NSMutableDictionary *data = @{}.mutableCopy;
     data[@"reason"] = @"push";
-    data[@"newUrl"] = newUrl;
-    data[@"oldUrl"] = oldUrl;
+    
+    if (newUrl != nil) {
+        data[@"newUrl"] = newUrl;
+    }
+    if (oldUrl != nil) {
+        data[@"oldUrl"] = oldUrl;
+    }
     
     if (self.muted == NO) {
         [NSNotificationCenter.defaultCenter
@@ -90,8 +95,13 @@
     
     NSMutableDictionary *data = @{}.mutableCopy;
     data[@"reason"] = @"pop";
-    data[@"newUrl"] = newUrl;
-    data[@"oldUrl"] = oldUrl;
+    
+    if (newUrl != nil) {
+        data[@"newUrl"] = newUrl;
+    }
+    if (oldUrl != nil) {
+        data[@"oldUrl"] = oldUrl;
+    }
     
     if (self.muted == NO) {
         [NSNotificationCenter.defaultCenter
