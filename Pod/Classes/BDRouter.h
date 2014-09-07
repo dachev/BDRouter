@@ -9,10 +9,17 @@
 #import <Foundation/Foundation.h>
 #import "NSURL+BDRouter.h"
 
+#define SERVICES_ROUTER_URL_WILL_CHANGE_NOTIFICATION @"services::router::url::will::change"
+#define SERVICES_ROUTER_URL_DID_CHANGE_NOTIFICATION @"services::router::url::did::change"
+
 @interface BDRouter : NSObject
 + (BDRouter*)shared;
-- (void)addObserver:(NSObject*)observer selector:(SEL)selector;
-- (void)removeObserver:(NSObject*)observer;
-- (void)push:(NSURL*)url;
+- (void)mute;
+- (void)unmute;
+- (int)size;
+- (void)push:(NSURL*)newUrl;
 - (void)pop;
+- (void)compact;
+- (NSURL*)peek:(int)index;
+- (NSURL*)find:(NSString*)prefix;
 @end

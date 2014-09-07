@@ -10,12 +10,11 @@
 #import "BDRouter.h"
 
 @interface BDRouter ()
-@property (nonatomic, strong) NSMapTable *observers;
 @property (nonatomic, strong) NSMutableArray *history;
+@property (nonatomic, assign) BOOL muted;
 @end
 
 @implementation BDRouter
-@synthesize observers, history;
 
 #pragma mark - Object lifecycle
 + (BDRouter*)shared
@@ -29,76 +28,150 @@
 {
     self = [super init];
     if (self) {
-        self.observers = [NSMapTable weakToStrongObjectsMapTable];
-        self.history   = @[].mutableCopy;
+        self.history = @[].mutableCopy;
     }
     return self;
 }
 
-#pragma mark - Managing bservers
-- (void)addObserver:(NSObject*)observer selector:(SEL)selector;
+#pragma mark - Muting
+- (void)mute
 {
-    NSString *selectorName = NSStringFromSelector(selector);
-    [self.observers setObject:selectorName forKey:observer];
+    self.muted = YES;
 }
 
-- (void)removeObserver:(NSObject*)observer;
+- (void)unmute
 {
-    [self.observers removeObjectForKey:observer];
+    self.muted = NO;
 }
 
 #pragma mark - Routing
-- (void)push:(NSURL*)url
+- (void)push:(NSURL*)newUrl
 {
-    [self performSelector:@selector(pushDelayed:) withObject:url afterDelay:0.1];
-}
-
-- (void)pushDelayed:(NSURL*)url
-{
-    [self.history addObject:url];
+    if (newUrl == nil) {
+        return;
+    }
     
-    for (NSObject *observer in [self.observers keyEnumerator]) {
-        NSString *selectorName = [self.observers objectForKey:observer];
-        SEL selector = NSSelectorFromString(selectorName);
-        if ([observer respondsToSelector:selector] == NO) {
-            continue;
-        }
-        
-        dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 0.01);
-        dispatch_after(delay, dispatch_get_main_queue(), ^(void){
-            BD_SUPPRESS_PERFORM_SELECTOR_LEAK_WARNING([observer performSelector:selector withObject:url]);
-        });
+    NSURL *oldUrl = [self peek:-1];
+    if (oldUrl != nil && [newUrl.absoluteString isEqualToString:oldUrl.absoluteString]) {
+        return;
+    }
+    
+    NSMutableDictionary *data = @{}.mutableCopy;
+    data[@"reason"] = @"push";
+    data[@"newUrl"] = newUrl;
+    data[@"oldUrl"] = oldUrl;
+    
+    if (self.muted == NO) {
+        [NSNotificationCenter.defaultCenter
+         postNotificationName:SERVICES_ROUTER_URL_WILL_CHANGE_NOTIFICATION
+         object:self
+         userInfo:data];
+    }
+    
+    [self.history addObject:newUrl];
+    //[self flush];
+    
+    if (self.muted == NO) {
+        [NSNotificationCenter.defaultCenter
+         postNotificationName:SERVICES_ROUTER_URL_DID_CHANGE_NOTIFICATION
+         object:self
+         userInfo:data];
     }
 }
 
 - (void)pop
 {
-    [self performSelector:@selector(popDelayed) withObject:nil afterDelay:0.1];
-}
-
-- (void)popDelayed
-{
-    if (self.history.count < 1) {
+    NSURL *oldUrl = [self peek:-1];
+    NSURL *newUrl = [self peek:-2];
+    
+    if (oldUrl == nil) {
         return;
     }
     
-    NSURL *url = self.history.lastObject;
-    [self.history removeLastObject];
+    NSMutableDictionary *data = @{}.mutableCopy;
+    data[@"reason"] = @"pop";
+    data[@"newUrl"] = newUrl;
+    data[@"oldUrl"] = oldUrl;
     
-    for (NSObject *observer in [self.observers keyEnumerator]) {
-        NSString *selectorName = [self.observers objectForKey:observer];
-        SEL selector = NSSelectorFromString(selectorName);
-        if ([observer respondsToSelector:selector] == NO) {
-            continue;
-        }
-        
-        dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 0.01);
-        dispatch_after(delay, dispatch_get_main_queue(), ^(void){
-            BD_SUPPRESS_PERFORM_SELECTOR_LEAK_WARNING([observer performSelector:selector withObject:url]);
-        });
+    if (self.muted == NO) {
+        [NSNotificationCenter.defaultCenter
+         postNotificationName:SERVICES_ROUTER_URL_WILL_CHANGE_NOTIFICATION
+         object:self
+         userInfo:data];
+    }
+    
+    [self.history removeLastObject];
+    //[self flush];
+    
+    if (self.muted == NO) {
+        [NSNotificationCenter.defaultCenter
+         postNotificationName:SERVICES_ROUTER_URL_DID_CHANGE_NOTIFICATION
+         object:self
+         userInfo:data];
     }
 }
 
+#pragma mark = Searching
+- (NSURL*)peek:(int)index
+{
+    NSArray *items = self.history.copy;
+    if (index < 0) {
+        items = [[items reverseObjectEnumerator] allObjects];
+        index *= -1;
+        index -= 1;
+    }
+    
+    if (index < 0 || index >= items.count) {
+        return nil;
+    }
+    
+    return items[index];
+}
+
+- (NSURL*)find:(NSString*)prefix
+{
+    for (int i = self.history.count-1; i >= 0; i--) {
+        NSURL *url = self.history[i];
+        if ([url.path hasPrefix:prefix]) {
+            return url;
+        }
+    }
+    
+    return nil;
+}
+
 #pragma mark - Miscellaneous
+- (int)size
+{
+    return self.history.count;
+}
+
+- (void)compact
+{
+    NSURL *lastUrl = [self peek:-1];
+    if (lastUrl == nil) {
+        return;
+    }
+    
+    int pastUrlIndex = -1;
+    for (int i = self.history.count-2; i >= 0; i--) {
+        NSURL *url = self.history[i];
+        if ([url.absoluteString isEqualToString:lastUrl.absoluteString]) {
+            pastUrlIndex = i;
+            break;
+        }
+    }
+    
+    // nothing to compact
+    if (pastUrlIndex < 0) {
+        return;
+    }
+    
+    [self mute];
+    while (self.history.count > pastUrlIndex+1) {
+        [self pop];
+    }
+    [self unmute];
+}
 
 @end
