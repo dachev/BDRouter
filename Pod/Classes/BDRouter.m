@@ -141,9 +141,11 @@
 - (NSURL*)find:(NSString*)prefix
 {
     for (int i = self.history.count-1; i >= 0; i--) {
-        NSURL *url = self.history[i];
-        if ([url.path hasPrefix:prefix]) {
-            return url;
+        NSURL *thisUrl       = self.history[i];
+        NSString *thisPrefix = [NSString stringWithFormat:@"/%@", [thisUrl.components componentsJoinedByString:@"/"]];
+        
+        if ([thisPrefix hasPrefix:prefix]) {
+            return thisUrl;
         }
     }
     
