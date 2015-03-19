@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "BDRouter"
-  s.version          = "0.2.2"
+  s.version          = "0.2.3"
   s.summary          = "App router and history manager for iOS."
   s.description      = <<-DESC
                        Unobtrusive app router and history manager for iOS.

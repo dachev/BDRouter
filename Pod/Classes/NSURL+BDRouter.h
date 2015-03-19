@@ -19,4 +19,5 @@
 - (BOOL)componentAtIndex:(NSInteger)index equals:(NSString*)val;
 - (BOOL)hasPathPrefix:(NSString*)prefix;
 - (NSString*)internalPath;
+// TODO: expose escapeValue
 @end

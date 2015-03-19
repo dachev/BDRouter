@@ -56,21 +56,21 @@
         return;
     }
     
-    NSMutableDictionary *data = @{}.mutableCopy;
-    data[@"reason"] = @"push";
+    self.lastOperation = @{}.mutableCopy;
+    self.lastOperation[@"reason"] = @"push";
     
     if (newUrl != nil) {
-        data[@"newUrl"] = newUrl;
+        self.lastOperation[@"newUrl"] = newUrl;
     }
     if (oldUrl != nil) {
-        data[@"oldUrl"] = oldUrl;
+        self.lastOperation[@"oldUrl"] = oldUrl;
     }
     
     if (self.muted == NO) {
         [NSNotificationCenter.defaultCenter
          postNotificationName:SERVICES_ROUTER_URL_WILL_CHANGE_NOTIFICATION
          object:self
-         userInfo:data];
+         userInfo:self.lastOperation];
     }
     
     [self.history addObject:newUrl];
@@ -80,7 +80,7 @@
         [NSNotificationCenter.defaultCenter
          postNotificationName:SERVICES_ROUTER_URL_DID_CHANGE_NOTIFICATION
          object:self
-         userInfo:data];
+         userInfo:self.lastOperation];
     }
 }
 
@@ -93,21 +93,21 @@
         return;
     }
     
-    NSMutableDictionary *data = @{}.mutableCopy;
-    data[@"reason"] = @"pop";
+    self.lastOperation = @{}.mutableCopy;
+    self.lastOperation[@"reason"] = @"pop";
     
     if (newUrl != nil) {
-        data[@"newUrl"] = newUrl;
+        self.lastOperation[@"newUrl"] = newUrl;
     }
     if (oldUrl != nil) {
-        data[@"oldUrl"] = oldUrl;
+        self.lastOperation[@"oldUrl"] = oldUrl;
     }
     
     if (self.muted == NO) {
         [NSNotificationCenter.defaultCenter
          postNotificationName:SERVICES_ROUTER_URL_WILL_CHANGE_NOTIFICATION
          object:self
-         userInfo:data];
+         userInfo:self.lastOperation];
     }
     
     [self.history removeLastObject];
@@ -117,7 +117,7 @@
         [NSNotificationCenter.defaultCenter
          postNotificationName:SERVICES_ROUTER_URL_DID_CHANGE_NOTIFICATION
          object:self
-         userInfo:data];
+         userInfo:self.lastOperation];
     }
 }
 

@@ -13,6 +13,8 @@
 #define SERVICES_ROUTER_URL_DID_CHANGE_NOTIFICATION @"services::router::url::did::change"
 
 @interface BDRouter : NSObject
+@property (nonatomic, strong) NSMutableDictionary *lastOperation;
+
 + (BDRouter*)shared;
 - (void)mute;
 - (void)unmute;
