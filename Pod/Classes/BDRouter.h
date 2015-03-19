@@ -18,10 +18,10 @@
 + (BDRouter*)shared;
 - (void)mute;
 - (void)unmute;
-- (int)size;
+- (NSInteger)size;
 - (void)push:(NSURL*)newUrl;
 - (void)pop;
 - (void)compact;
-- (NSURL*)peek:(int)index;
+- (NSURL*)peek:(NSInteger)index;
 - (NSURL*)find:(NSString*)prefix;
 @end

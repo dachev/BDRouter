@@ -122,7 +122,7 @@
 }
 
 #pragma mark = Searching
-- (NSURL*)peek:(int)index
+- (NSURL*)peek:(NSInteger)index
 {
     NSArray *items = self.history.copy;
     if (index < 0) {
@@ -140,7 +140,7 @@
 
 - (NSURL*)find:(NSString*)prefix
 {
-    for (int i = self.history.count-1; i >= 0; i--) {
+    for (NSInteger i = self.history.count-1; i >= 0; i--) {
         NSURL *thisUrl       = self.history[i];
         NSString *thisPrefix = [NSString stringWithFormat:@"/%@", [thisUrl.components componentsJoinedByString:@"/"]];
         
@@ -153,7 +153,7 @@
 }
 
 #pragma mark - Miscellaneous
-- (int)size
+- (NSInteger)size
 {
     return self.history.count;
 }
@@ -165,8 +165,8 @@
         return;
     }
     
-    int pastUrlIndex = -1;
-    for (int i = self.history.count-2; i >= 0; i--) {
+    NSInteger pastUrlIndex = -1;
+    for (NSInteger i = self.history.count-2; i >= 0; i--) {
         NSURL *url = self.history[i];
         if ([url.absoluteString isEqualToString:lastUrl.absoluteString]) {
             pastUrlIndex = i;
