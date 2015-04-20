@@ -229,7 +229,7 @@
 
 - (BOOL)hasPathPrefix:(NSString*)prefix
 {
-    return [self.path hasPrefix:prefix];
+    return [self.internalPath hasPrefix:prefix];
 }
 
 - (NSString*)internalPath
